@@ -5,7 +5,7 @@ function [I] = f_my_GAN(I_input,numEpochs,scale,im_size)
 im_input_size = im_size(:,1:2);
 layersDiscriminator = [
     imageInputLayer(ceil(im_input_size./scale),"Name","imageinput","Normalization","none")
-    SpectralNormalization(convolution2dLayer([7,7],64,"NumChannels", 3, 'Stride',1,'Padding','same','Name','conv1') , "sn1" )
+    SpectralNormalization(convolution2dLayer([7,7],64,"NumChannels", 1, 'Stride',1,'Padding','same','Name','conv1') , "sn1" )
     convolution2dLayer([1 1],64,"Name","conv_2","Padding","same")
     batchNormalizationLayer("Name","batchnorm_1")
     reluLayer("Name","relu_1")
