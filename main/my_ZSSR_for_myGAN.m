@@ -1,7 +1,7 @@
 clear 
 %% 数据输入与初始化
-filepath = '/Users/rxthinking/Desktop/imgs/';
-img_name = 'im_3.png';
+filepath = 'F:\Code_Reports\Final_Design\test_images\lr_x2\';
+img_name = 'im_6.png';
 
 
 % 输入图片
@@ -107,7 +107,7 @@ for i = 1:epoch
 end
 
 %% 超分辨测试
-I_gt = imread('/Users/rxthinking/Desktop/imgs/img_3_gt.png');
+I_gt = imread('F:\Code_Reports\Final_Design\test_images\gt\img_6_gt.png');
 
 % to the size of gt
 size_gt = size(I_gt);
