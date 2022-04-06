@@ -51,7 +51,7 @@ bicubic_k = [[0.0001373291015625, 0.0004119873046875, -0.0013275146484375, -0.00
             [-.0050811767578125, -0.0152435302734375, 0.0491180419921875, 0.1880035400390630, 0.1880035400390630, 0.0491180419921875, -0.0152435302734375, -0.0050811767578125];
             [-.0013275146484380, -0.0039825439453125, 0.0128326416015625, 0.0491180419921875, 0.0491180419921875, 0.0128326416015625, -0.0039825439453125, -0.0013275146484375];
             [0.0004119873046875, 0.0012359619140625, -0.0039825439453125, -0.0152435302734375, -0.0152435302734375, -0.0039825439453125, 0.0012359619140625, 0.0004119873046875];
-            [0.0001373291015625, 0.0004119873046875, -0.0013275146484375, -0.0050811767578125, -0.0050811767578125, -0.0013275146484375, 0.0004119873046875, 0.0001373291015625]]
+            [0.0001373291015625, 0.0004119873046875, -0.0013275146484375, -0.0050811767578125, -0.0050811767578125, -0.0013275146484375, 0.0004119873046875, 0.0001373291015625]];
 
 %% 指定训练选项
 
@@ -93,6 +93,7 @@ grid on
 iteration = 0;
 start = tic;
 
+bicubic = 1;
 % Loop over epochs.
 for epoch = 1:numEpochs
     channel = mod(epoch,3)+1;
@@ -116,19 +117,29 @@ for epoch = 1:numEpochs
         Z = im2double(I_input);
         Z = Z(:,:,channel);
          Z = imcrop(Z,[1 1 63 63]);
-        dlZ = dlarray(Z,'SSCB');        
+         Z_bicubic = imresize(Z,[32,32]);
+        dlZ = dlarray(Z,'SSCB');  
+         dlZ_bicubic = dlarray(Z_bicubic,'SSCB');
         
         if (executionEnvironment == "auto" && canUseGPU) || executionEnvironment == "gpu"
             dlZ = gpuArray(dlZ);
+            dlZ_bicubic = gpuArray(dlZ_bicubic);
         end
         
         % Evaluate the model gradients and the generator state using
         % dlfeval and the modelGradients function listed at the end of the
         % example.
-        [gradientsGenerator, gradientsDiscriminator, stateGenerator, scoreGenerator, scoreDiscriminator] = ...
-            dlfeval(@modelGradients, dlnetGenerator, dlnetDiscriminator, dlX, dlZ, flipFactor);
+        if bicubic
+            dlZ_valid = dlZ_bicubic;
+        else
+            dlZ_valid = dlZ;
+        end
+                [gradientsGenerator, gradientsDiscriminator, stateGenerator, scoreGenerator, scoreDiscriminator] = ...
+            dlfeval(@modelGradients, dlnetGenerator, dlnetDiscriminator, dlX, dlZ_valid, flipFactor,bicubic);
         dlnetGenerator.State = stateGenerator;
-        
+        if scoreGenerator >=0.49
+            bicubic = 0;
+        end
         % Update the discriminator network parameters.
         [dlnetDiscriminator,trailingAvgDiscriminator,trailingAvgSqDiscriminator] = ...
             adamupdate(dlnetDiscriminator, gradientsDiscriminator, ...
@@ -179,13 +190,19 @@ end
 
 %% 定义模型梯度、损失函数和分数
 function [gradientsGenerator, gradientsDiscriminator, stateGenerator, scoreGenerator, scoreDiscriminator] = ...
-    modelGradients(dlnetGenerator, dlnetDiscriminator, dlX, dlZ, flipFactor)
+    modelGradients(dlnetGenerator, dlnetDiscriminator, dlX, dlZ, flipFactor,bicubic)
 
 % Calculate the predictions for real data with the discriminator network.
 dlYPred = forward(dlnetDiscriminator, dlX);
 
 % Calculate the predictions for generated data with the discriminator network.
-[dlXGenerated,stateGenerator] = forward(dlnetGenerator,dlZ);
+if bicubic
+    dlXGenerated = dlZ;
+     stateGenerator = dlnetGenerator.State;
+
+else
+    [dlXGenerated,stateGenerator] = forward(dlnetGenerator,dlZ);
+end
 dlYPredGenerated = forward(dlnetDiscriminator, dlXGenerated);
 
 % Convert the discriminator outputs to probabilities.
