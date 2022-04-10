@@ -137,7 +137,7 @@ for epoch = 1:numEpochs
                 [gradientsGenerator, gradientsDiscriminator, stateGenerator, scoreGenerator, scoreDiscriminator] = ...
             dlfeval(@modelGradients, dlnetGenerator, dlnetDiscriminator, dlX, dlZ_valid, flipFactor,bicubic);
         dlnetGenerator.State = stateGenerator;
-        if scoreGenerator >=0.49
+        if scoreGenerator >=0.6
             bicubic = 0;
         end
         % Update the discriminator network parameters.
@@ -250,5 +250,12 @@ lossDiscriminator = mse(probReal,probGenerated);
 % Calculate the loss for the generator network.
 lossGenerator = mse(dlX,dlXGenerated);
 
+end
+function [regulation] = regulate(dlarray)
+    if canUseGPU
+        I = gather(extractdata(dlarray));
+    else
+        I = extractdata(dlarray);
+    end
 end
 end

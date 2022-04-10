@@ -1,13 +1,13 @@
 clear 
 %% 数据输入与初始化
 filepath = 'F:\Code_Reports\Final_Design\test_images\lr_x2\';
-img_name = 'im_6.png';
+img_name = 'im_2.png';
 
 
 % 输入图片
-downscale = 0; %是否需要下采样(为了加快训练速度)
+downscale = 1; %是否需要下采样(为了加快训练速度)
 scale_for_kernelGAN = 2;  %下采样倍数
-scale_for_accelerate_training = 4;
+scale_for_accelerate_training = 2;
 
 I = double(imread([filepath,img_name]));
 
@@ -107,7 +107,7 @@ for i = 1:epoch
 end
 
 %% 超分辨测试
-I_gt = imread('F:\Code_Reports\Final_Design\test_images\gt\img_6_gt.png');
+I_gt = imread('F:\Code_Reports\Final_Design\test_images\gt\img_2_gt.png');
 
 % to the size of gt
 size_gt = size(I_gt);
