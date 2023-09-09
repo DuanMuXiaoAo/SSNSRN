@@ -230,6 +230,7 @@ class ZSSR:
         # fit linear curve and check slope to determine whether to do nothing, reduce learning rate or finish
         if (not (1 + self.iter) % self.conf.learning_rate_policy_check_every
                 and self.iter - self.learning_rate_change_iter_nums[-1] > self.conf.min_iters):
+            print('/// 开始更新学习率 ///')
             # noinspection PyTupleAssignmentBalance
             [slope, _], [[var, _], _] = np.polyfit(self.mse_steps[-int(self.conf.learning_rate_slope_range /
                                                                        self.conf.run_test_every):],
@@ -241,11 +242,15 @@ class ZSSR:
             std = np.sqrt(var)
 
             # Determine learning rate maintaining or reduction by the ration between slope and noise
+            print(f'当前数据为：{-self.conf.learning_rate_change_ratio * slope}，更新标准为小于：{std}')
             if -self.conf.learning_rate_change_ratio * slope < std:
                 self.learning_rate /= 10
 
                 # Keep track of learning rate changes for plotting purposes
                 self.learning_rate_change_iter_nums.append(self.iter)
+                print(f'当前学习率为{self.learning_rate}，目标学习率为{self.conf.min_learning_rate}')
+            else:
+                print('本次不更新！！')
 
     def quick_test(self):
         # There are four evaluations needed to be calculated:
@@ -282,6 +287,7 @@ class ZSSR:
             # Use augmentation from original input image to create current father.
             # If other scale factors were applied before, their result is also used (hr_fathers_in)
             # crop_center = choose_center_of_crop(self.prob_map) if self.conf.choose_varying_crop else None
+            print(f"当前第{self.iter}轮,共{self.conf.max_iters}次迭代")
             crop_center = None
 
             self.hr_father, self.cropped_loss_map = \

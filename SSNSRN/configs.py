@@ -27,7 +27,7 @@ class Config:
         self.parser.add_argument('--D_kernel_size', type=int, default=7, help='鉴别器网络卷积核大小')
 
         # 训练轮数
-        self.parser.add_argument('--max_iters', type=int, default=7000, help='训练轮数')
+        self.parser.add_argument('--max_iters', type=int, default=3000, help='训练轮数')
 
         # Optimization hyper-parameters
         self.parser.add_argument('--g_lr', type=float, default=2e-4, help='生成器初始学习率')

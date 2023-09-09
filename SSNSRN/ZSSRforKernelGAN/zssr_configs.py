@@ -6,7 +6,7 @@ class Config:
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
     scale_factors = [[2.0, 2.0]]  # list of pairs (vertical, horizontal) for gradual increments in resolution
     base_change_sfs = []  # list of scales after which the input is changed to be the output (recommended for high sfs)
-    max_iters = 4000
+    max_iters = 400
     min_iters = 250
     min_learning_rate = 9e-6  # this tells the algorithm when to stop (specify lower than the last learning-rate)
     width = 64
@@ -29,7 +29,7 @@ class Config:
     # Params concerning learning rate policy
     learning_rate = 0.001
     learning_rate_change_ratio = 1.5  # ratio between STD and slope of linear fit, under which lr is reduced
-    learning_rate_policy_check_every = 60
+    learning_rate_policy_check_every = 30
     learning_rate_slope_range = 256
 
     # Data augmentation related params
@@ -38,7 +38,7 @@ class Config:
     augment_min_scale = 0  # changed from 0
     augment_scale_diff_sigma = 0  # changed from 0
     augment_shear_sigma = 0  # changed from 0
-    augment_allow_rotation = False  # changed from True  # recommended false for non-symmetric kernels
+    augment_allow_rotation = True  # changed from True  # recommended false for non-symmetric kernels
 
     # params related to test and display
     run_test = True

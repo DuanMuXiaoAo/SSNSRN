@@ -40,8 +40,7 @@ def imresize(im, scale_factor=None, output_shape=None, kernel=None, antialiasing
 
         # 计算结果
         out_im = resize_along_dim(out_im, dim, weights, field_of_view)
-
-
+    return out_im
 """
 
 下面的代码就先不研究了，反正都是resize图像用的，影响不大
